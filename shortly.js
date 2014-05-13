@@ -103,6 +103,14 @@ app.post('/login', function(req, res) {
   });
 });
 
+app.post('/logout', function(req, res) {
+  req.session.destroy(function(){
+    console.log('successful logout');
+    res.redirect('/login');
+    console.log('successful redirect');
+  });
+});
+
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
 // assume the route is a short code and try and handle it here.
