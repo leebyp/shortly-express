@@ -15,11 +15,13 @@ app.configure(function() {
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
   app.use(partials());
-  app.use(express.bodyParser())
+  app.use(express.bodyParser());
+  app.use(express.cookieParser('shhhh, very secret'));
+  app.use(express.session());
   app.use(express.static(__dirname + '/public'));
 });
 
-app.get('/', function(req, res) {
+app.get('/', util.checkAuth, function(req, res) {
   res.render('index');
 });
 
@@ -87,10 +89,18 @@ app.get('/login', function(req, res) {
   res.render('login');
 });
 
-var bcrypt = require('bcrypt-nodejs');
 app.post('/login', function(req, res) {
   // Check if user credentials are valid
-  new User({username: req.body.username}).checkCredentials(req, res);
+  User.forge({username: req.body.username}).checkUser(req, res, function(req, res, success) {
+    if(success) {
+      req.session.regenerate(function () {
+        req.session.user = req.body.username;
+        res.redirect('/');
+      });
+    } else {
+      res.redirect('/login');
+    }
+  });
 });
 
 /************************************************************/
