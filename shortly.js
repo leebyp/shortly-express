@@ -25,7 +25,7 @@ app.get('/', util.checkAuth, function(req, res) {
   res.render('index');
 });
 
-app.get('/create', function(req, res) {
+app.get('/create', util.checkAuth, function(req, res) {
   res.render('index');
 });
 
@@ -103,12 +103,9 @@ app.post('/login', function(req, res) {
   });
 });
 
-app.post('/logout', function(req, res) {
-  req.session.destroy(function(){
-    console.log('successful logout');
-    res.redirect('/login');
-    console.log('successful redirect');
-  });
+app.get('/logout', function(req, res) {
+  req.session.destroy();
+  res.redirect('/');
 });
 
 /************************************************************/
