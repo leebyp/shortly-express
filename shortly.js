@@ -75,10 +75,41 @@ app.get('/signup', function(req, res) {
 });
 
 app.post('/signup', function(req, res) {
+  // Create a new user and save to database
   User.forge({username: req.body.username, password: req.body.password})
   .save().then(function() {
     console.log('created new user');
     res.redirect('/');
+  });
+});
+
+app.get('/login', function(req, res) {
+  res.render('login');
+});
+
+var bcrypt = require('bcrypt-nodejs');
+app.post('/login', function(req, res) {
+  // Check if user credentials are valid
+  new User({username: req.body.username})
+  // .users()
+  .fetch()
+  .then(function(user) {
+    if(!user) {
+      console.log('username does not exist');
+      res.redirect('/login');
+    } else {
+      bcrypt.compare(req.body.password, user.get('password'), function(err, matches){
+        if (err) {
+          console.error(err);
+        } else if(!matches) {
+          console.log('wrong password');
+        } else {
+          // if they are, redirect to index
+          console.log('successful login as', req.body.username);
+          res.redirect('/');
+        }
+      });
+    }
   });
 });
 
