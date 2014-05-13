@@ -21,6 +21,28 @@ var User = db.Model.extend({
       });*/
       model.set('password', bcrypt.hashSync(model.get('password')));
     });
+  },
+  checkUser: function(req, res, callback){
+    this.fetch()
+    .then(function(user) {
+      if(!user) {
+        console.log('username does not exist');
+        // do something to help user out
+      } else {
+        bcrypt.compare(req.body.password, user.get('password'), function(err, matches){
+          if (err) {
+            console.error(err);
+          } else if(!matches) {
+            console.log('wrong password');
+            // do something to help user out
+          } else {
+            // if they are, redirect to index
+            console.log('successful login as', req.body.username);
+            callback(req, res, true);
+          }
+        });
+      }
+    });
   }
 });
 
